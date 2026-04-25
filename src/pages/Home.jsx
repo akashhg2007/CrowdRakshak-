@@ -5,11 +5,18 @@ import { searchTemple, templesDatabase } from '../data/temples';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedState, setSelectedState] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  const suggestions = searchQuery 
-    ? Object.values(templesDatabase).filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  const allStates = [...new Set(Object.values(templesDatabase).map(t => t.state))].filter(Boolean).sort();
+
+  const suggestions = (searchQuery || selectedState) 
+    ? Object.values(templesDatabase).filter(t => {
+        const matchesSearch = searchQuery === '' || t.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesState = selectedState === '' || t.state === selectedState;
+        return matchesSearch && matchesState;
+      }).slice(0, 50) // Limit to 50 to prevent huge DOM if a state has hundreds
     : [];
 
   const handleSelect = (templeId) => {
@@ -18,13 +25,15 @@ export default function Home() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!searchQuery) return;
+    if (!searchQuery && !selectedState) return;
     
     setIsSearching(true);
     // Simulate API call and redirect
     setTimeout(() => {
-      const templeId = searchTemple(searchQuery);
-      navigate(`/operator?temple=${templeId}`);
+      // If they searched something, find it. If they only picked a state, go to the first temple in that state
+      const templeId = searchQuery ? searchTemple(searchQuery) : suggestions[0]?.id;
+      if (templeId) navigate(`/operator?temple=${templeId}`);
+      else setIsSearching(false);
     }, 1200);
   };
 
@@ -50,24 +59,36 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Search Bar */}
+        {/* Search Bar & State Filter */}
         <div className="w-full max-w-2xl relative mb-16">
-          <form onSubmit={handleSearch} className="relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <Search className="h-6 w-6 text-neutral-500" />
-            </div>
-            <input
-              type="text"
-              className="w-full bg-[#111] border border-white/20 text-white text-lg rounded-full py-5 pl-14 pr-32 focus:outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue transition-all shadow-[0_0_30px_rgba(37,99,235,0.1)]"
-              placeholder="Search for a temple (e.g. ISKCON Bangalore)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button 
-              type="submit"
-              disabled={isSearching}
-              className="absolute right-2 top-2 bottom-2 bg-signal-blue text-white font-bold px-6 rounded-full hover:bg-blue-600 transition-colors flex items-center justify-center min-w-[120px]"
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <select 
+              value={selectedState} 
+              onChange={(e) => setSelectedState(e.target.value)}
+              className="bg-[#111] border border-white/20 text-white rounded-full px-6 py-4 focus:outline-none focus:border-signal-blue w-full md:w-1/3 shadow-[0_0_15px_rgba(37,99,235,0.05)] cursor-pointer appearance-none"
             >
+              <option value="">All States</option>
+              {allStates.map(state => (
+                <option key={state} value={state}>{state}</option>
+              ))}
+            </select>
+            
+            <form onSubmit={handleSearch} className="relative flex-grow">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <Search className="h-6 w-6 text-neutral-500" />
+              </div>
+              <input
+                type="text"
+                className="w-full bg-[#111] border border-white/20 text-white text-lg rounded-full py-4 pl-14 pr-32 focus:outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue transition-all shadow-[0_0_30px_rgba(37,99,235,0.1)]"
+                placeholder="Search for a temple..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button 
+                type="submit"
+                disabled={isSearching || (!searchQuery && !selectedState)}
+                className="absolute right-2 top-2 bottom-2 bg-signal-blue text-white font-bold px-6 rounded-full hover:bg-blue-600 disabled:opacity-50 transition-colors flex items-center justify-center min-w-[100px]"
+              >
               {isSearching ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
@@ -75,10 +96,11 @@ export default function Home() {
               )}
             </button>
           </form>
+          </div>
 
           {/* Autocomplete Dropdown */}
-          {searchQuery && suggestions.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-[#111] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
+          {(searchQuery || selectedState) && suggestions.length > 0 && (
+            <div className="absolute top-full mt-2 w-full bg-[#111] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 max-h-[400px] overflow-y-auto custom-scrollbar">
               {suggestions.map((temple) => (
                 <button
                   key={temple.id}
