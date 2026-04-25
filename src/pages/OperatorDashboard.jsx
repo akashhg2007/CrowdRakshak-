@@ -158,8 +158,8 @@ export default function OperatorDashboard() {
             { label: 'Avg Darshan Wait', value: temple.waitTimes.free, icon: Clock, color: 'text-signal-blue' },
             { label: 'Parking Free', value: temple.parkingSpots.toString(), icon: Car, color: 'text-green-500' },
           ].map((stat, i) => (
-            <div key={i} className={`flex items-center gap-4 border p-4 rounded-sm transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-black border-white/10'}`}>
-              <div className={`p-3 rounded-full ${emergencyMode ? 'bg-red-500/10' : 'bg-white/5'} ${stat.color}`}>
+            <div key={i} className={`flex items-center gap-4 border p-4 rounded-xl backdrop-blur-xl shadow-lg transition-all ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
+              <div className={`p-3 rounded-full ${emergencyMode ? 'bg-red-500/10' : 'bg-white/10'} ${stat.color}`}>
                 <stat.icon className="w-5 h-5" />
               </div>
               <div>
@@ -193,7 +193,7 @@ export default function OperatorDashboard() {
         <div className="col-span-1 lg:col-span-3 flex flex-col gap-4 lg:overflow-y-auto lg:pr-2 custom-scrollbar">
           
           {/* Alert Center */}
-          <div className={`border p-4 rounded-sm flex flex-col gap-3 transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-black border-white/10'}`}>
+          <div className={`border p-5 rounded-2xl flex flex-col gap-3 backdrop-blur-xl shadow-lg transition-all ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
             <h3 className="text-xs font-mono text-neutral-400 flex items-center gap-2">
               <ShieldAlert className={`w-4 h-4 ${emergencyMode ? 'text-red-500' : 'text-signal-blue'}`} />
               ALERT CENTER
@@ -217,7 +217,7 @@ export default function OperatorDashboard() {
           </div>
 
           {/* Queue Management & Digital Tokens */}
-          <div className={`border p-4 rounded-sm flex-grow flex flex-col transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30 opacity-50 pointer-events-none' : 'bg-black border-white/10'}`}>
+          <div className={`border p-5 rounded-2xl flex-grow flex flex-col backdrop-blur-xl shadow-lg transition-all ${emergencyMode ? 'bg-red-950/40 border-red-500/30 opacity-50 pointer-events-none' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
             <h3 className="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-4">
               <Users className="w-4 h-4 text-signal-blue" />
               WAIT TIMES & DIGITAL TOKENS
@@ -245,7 +245,7 @@ export default function OperatorDashboard() {
         <div className="col-span-1 lg:col-span-6 flex flex-col gap-4">
           
           {/* Live Smart Map (Temple Interior) */}
-          <div className={`border p-4 rounded-sm flex-1 flex flex-col z-0 transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-black border-white/10'}`}>
+          <div className={`border p-5 rounded-2xl flex-1 flex flex-col z-0 backdrop-blur-xl shadow-lg transition-all ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-2 mb-4">
               <h3 className="text-xs font-mono text-neutral-400 flex items-center gap-2">
                  <MapIcon className={`w-4 h-4 ${emergencyMode ? 'text-red-500' : 'text-signal-blue'}`} /> TEMPLE TRAFFIC OR CROWD
@@ -306,7 +306,7 @@ export default function OperatorDashboard() {
           </div>
 
           {/* OpenStreetMap Traffic Simulation */}
-          <div className={`border p-4 rounded-sm flex-1 flex flex-col z-0 transition-colors ${emergencyMode ? 'bg-[#1a0505] border-red-500/30' : 'bg-[#111] border-white/10'}`}>
+          <div className={`border p-5 rounded-2xl flex-1 flex flex-col z-0 backdrop-blur-xl shadow-lg transition-all ${emergencyMode ? 'bg-[#1a0505] border-red-500/30' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
             <h3 className="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-4">
                <Car className={`w-4 h-4 ${emergencyMode ? 'text-red-500' : 'text-signal-blue'}`} /> BEST ROAD TO ENTER THE TEMPLE
             </h3>
@@ -356,7 +356,7 @@ export default function OperatorDashboard() {
         <div className="col-span-1 lg:col-span-3 flex flex-col gap-4 lg:overflow-y-auto lg:pl-2 custom-scrollbar">
           
           {/* AI Prediction Graph */}
-          <div className={`border p-4 rounded-sm h-56 flex flex-col transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30 opacity-50 pointer-events-none' : 'bg-black border-white/10'}`}>
+          <div className={`border p-5 rounded-2xl h-56 flex flex-col backdrop-blur-xl shadow-lg transition-all ${emergencyMode ? 'bg-red-950/40 border-red-500/30 opacity-50 pointer-events-none' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}>
             <h3 className="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-4">
               <TrendingUp className="w-4 h-4 text-signal-blue" />
               AI PREDICTION (NEXT 60M)
@@ -418,7 +418,7 @@ export default function OperatorDashboard() {
           </div>
 
           {/* CRISIS COORDINATION (Replaced Auto Notifications) */}
-          <div className="bg-black border border-white/10 p-4 rounded-sm flex-grow flex flex-col relative overflow-hidden">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-5 rounded-2xl flex-grow flex flex-col relative overflow-hidden shadow-lg transition-all hover:bg-white/10">
             <h3 className="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-4">
               <Siren className="w-4 h-4 text-red-500" />
               CRISIS COORDINATION

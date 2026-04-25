@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, ChevronDown } from 'lucide-react';
 import { searchTemple, templesDatabase } from '../data/temples';
 
 export default function Home() {
@@ -40,8 +40,9 @@ export default function Home() {
   return (
     <div className="bg-[#050505] min-h-[calc(100vh-64px)] text-white font-sans overflow-x-hidden relative">
       
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-signal-blue/10 blur-[150px] rounded-full pointer-events-none"></div>
+      {/* Background Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-signal-blue/20 blur-[120px] rounded-full pointer-events-none mix-blend-screen"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-900/10 blur-[150px] rounded-full pointer-events-none mix-blend-screen"></div>
 
       <div className="max-w-4xl mx-auto px-6 pt-20 pb-24 relative z-10 flex flex-col items-center">
         
@@ -61,17 +62,22 @@ export default function Home() {
 
         {/* Search Bar & State Filter */}
         <div className="w-full max-w-2xl relative mb-16">
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <select 
-              value={selectedState} 
-              onChange={(e) => setSelectedState(e.target.value)}
-              className="bg-[#111] border border-white/20 text-white rounded-full px-6 py-4 focus:outline-none focus:border-signal-blue w-full md:w-1/3 shadow-[0_0_15px_rgba(37,99,235,0.05)] cursor-pointer appearance-none"
-            >
-              <option value="">All States</option>
-              {allStates.map(state => (
-                <option key={state} value={state}>{state}</option>
-              ))}
-            </select>
+          <div className="flex flex-col md:flex-row gap-4 mb-4 relative z-20">
+            <div className="relative w-full md:w-1/3 group">
+              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                <ChevronDown className="h-5 w-5 text-neutral-400 group-hover:text-signal-blue transition-colors" />
+              </div>
+              <select 
+                value={selectedState} 
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="bg-[#111]/80 backdrop-blur-md border border-white/10 text-white rounded-2xl px-6 py-4 focus:outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue w-full shadow-[0_0_20px_rgba(37,99,235,0.05)] cursor-pointer appearance-none hover:bg-[#1a1a1a] transition-all"
+              >
+                <option value="">🗺️ All States</option>
+                {allStates.map(state => (
+                  <option key={state} value={state}>{state}</option>
+                ))}
+              </select>
+            </div>
             
             <form onSubmit={handleSearch} className="relative flex-grow">
               <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -79,7 +85,7 @@ export default function Home() {
               </div>
               <input
                 type="text"
-                className="w-full bg-[#111] border border-white/20 text-white text-lg rounded-full py-4 pl-14 pr-32 focus:outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue transition-all shadow-[0_0_30px_rgba(37,99,235,0.1)]"
+                className="w-full bg-[#111]/80 backdrop-blur-md border border-white/10 text-white text-lg rounded-2xl py-4 pl-14 pr-32 focus:outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue transition-all shadow-[0_0_20px_rgba(37,99,235,0.05)] hover:bg-[#1a1a1a]"
                 placeholder="Search for a temple..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -100,7 +106,7 @@ export default function Home() {
 
           {/* Autocomplete Dropdown */}
           {(searchQuery || selectedState) && suggestions.length > 0 && (
-            <div className="absolute top-full mt-2 w-full bg-[#111] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50 max-h-[400px] overflow-y-auto custom-scrollbar">
+            <div className="absolute top-[110%] w-full bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50 max-h-[400px] overflow-y-auto custom-scrollbar">
               {suggestions.map((temple) => (
                 <button
                   key={temple.id}
