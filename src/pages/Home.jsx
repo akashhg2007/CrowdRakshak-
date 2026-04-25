@@ -6,6 +6,7 @@ import { searchTemple, templesDatabase } from '../data/temples';
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedState, setSelectedState] = useState('');
+  const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
@@ -64,19 +65,39 @@ export default function Home() {
         <div className="w-full max-w-2xl relative mb-16">
           <div className="flex flex-col md:flex-row gap-4 mb-4 relative z-20">
             <div className="relative w-full md:w-1/3 group">
-              <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                <ChevronDown className="h-5 w-5 text-neutral-400 group-hover:text-signal-blue transition-colors" />
-              </div>
-              <select 
-                value={selectedState} 
-                onChange={(e) => setSelectedState(e.target.value)}
-                className="bg-[#111]/80 backdrop-blur-md border border-white/10 text-white rounded-2xl px-6 py-4 focus:outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue w-full shadow-[0_0_20px_rgba(37,99,235,0.05)] cursor-pointer appearance-none hover:bg-[#1a1a1a] transition-all"
+              <button
+                type="button"
+                onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
+                className="bg-[#111]/80 backdrop-blur-md border border-white/10 text-white rounded-2xl px-6 py-4 focus:outline-none focus:border-signal-blue focus:ring-1 focus:ring-signal-blue w-full shadow-[0_0_20px_rgba(37,99,235,0.05)] text-left hover:bg-[#1a1a1a] transition-all flex justify-between items-center z-30"
               >
-                <option value="">🗺️ All States</option>
-                {allStates.map(state => (
-                  <option key={state} value={state}>{state}</option>
-                ))}
-              </select>
+                <span className="truncate">{selectedState ? selectedState : '🗺️ All States'}</span>
+                <ChevronDown className={`h-5 w-5 text-neutral-400 group-hover:text-signal-blue transition-transform shrink-0 ${isStateDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isStateDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsStateDropdownOpen(false)}></div>
+                  <div className="absolute top-[110%] left-0 w-full bg-[#111]/90 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50 max-h-[300px] overflow-y-auto custom-scrollbar flex flex-col">
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedState(''); setIsStateDropdownOpen(false); }}
+                      className={`text-left px-6 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 text-white ${selectedState === '' ? 'bg-white/10 font-bold' : ''}`}
+                    >
+                      🗺️ All States
+                    </button>
+                    {allStates.map(state => (
+                      <button
+                        key={state}
+                        type="button"
+                        onClick={() => { setSelectedState(state); setIsStateDropdownOpen(false); }}
+                        className={`text-left px-6 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 text-white ${selectedState === state ? 'bg-white/10 font-bold' : ''}`}
+                      >
+                        {state}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
             
             <form onSubmit={handleSearch} className="relative flex-grow">
