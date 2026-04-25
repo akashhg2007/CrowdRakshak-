@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrowdMind AI - Control Room</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            signal: { blue: '#2563eb' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background-color: #050505;
+      color: white;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(37, 99, 235, 0.5);
+    }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+      background: #000;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body class="font-sans h-screen flex flex-col p-4 overflow-hidden">
+
+  <!-- 1. Top Stats Bar -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4 shrink-0">
+    <!-- Stat 1 -->
+    <div class="flex items-center gap-4 bg-black border border-white/10 p-4 rounded-sm">
+      <div class="p-3 bg-white/5 rounded-full text-signal-blue"><i data-lucide="users" class="w-5 h-5"></i></div>
+      <div><p class="text-xs font-mono text-neutral-400">Total Devotees Today</p><p class="text-2xl font-bold">12,430</p></div>
+    </div>
+    <!-- Stat 2 -->
+    <div class="flex items-center gap-4 bg-black border border-white/10 p-4 rounded-sm">
+      <div class="p-3 bg-white/5 rounded-full text-yellow-500"><i data-lucide="activity" class="w-5 h-5"></i></div>
+      <div><p class="text-xs font-mono text-neutral-400">ISKCON Crowd Risk</p><p class="text-2xl font-bold">MEDIUM</p></div>
+    </div>
+    <!-- Stat 3 -->
+    <div class="flex items-center gap-4 bg-black border border-white/10 p-4 rounded-sm">
+      <div class="p-3 bg-white/5 rounded-full text-red-500"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+      <div><p class="text-xs font-mono text-neutral-400">Active Alerts</p><p class="text-2xl font-bold">3</p></div>
+    </div>
+    <!-- Stat 4 -->
+    <div class="flex items-center gap-4 bg-black border border-white/10 p-4 rounded-sm">
+      <div class="p-3 bg-white/5 rounded-full text-signal-blue"><i data-lucide="clock" class="w-5 h-5"></i></div>
+      <div><p class="text-xs font-mono text-neutral-400">Avg Darshan Wait</p><p class="text-2xl font-bold">45 min</p></div>
+    </div>
+    <!-- Stat 5 -->
+    <div class="flex items-center gap-4 bg-black border border-white/10 p-4 rounded-sm">
+      <div class="p-3 bg-white/5 rounded-full text-green-500"><i data-lucide="car" class="w-5 h-5"></i></div>
+      <div><p class="text-xs font-mono text-neutral-400">Parking Free</p><p class="text-2xl font-bold">124</p></div>
+    </div>
+  </div>
+
+  <!-- Main Grid Layout -->
+  <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+    
+    <!-- LEFT COLUMN (3 cols) -->
+    <div class="col-span-3 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+      
+      <!-- Alert Center -->
+      <div class="bg-black border border-white/10 p-4 rounded-sm flex flex-col gap-3">
+        <h3 class="text-xs font-mono text-neutral-400 flex items-center gap-2">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-signal-blue"></i> ALERT CENTER
+        </h3>
+        <div class="flex flex-col gap-2">
+          <div class="border-l-2 border-red-500 bg-red-500/10 p-2 text-sm"><span class="font-bold text-red-500">CRITICAL:</span> Main Darshan Hall overcrowded.</div>
+          <div class="border-l-2 border-yellow-500 bg-yellow-500/10 p-2 text-sm"><span class="font-bold text-yellow-500">WARNING:</span> South Parking at 90%.</div>
+          <div class="border-l-2 border-green-500 bg-green-500/10 p-2 text-sm"><span class="font-bold text-green-500">SAFE:</span> Prasadam Queue flowing well.</div>
+        </div>
+      </div>
+
+      <!-- Queue Management -->
+      <div class="bg-black border border-white/10 p-4 rounded-sm flex-grow flex flex-col">
+        <h3 class="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-4">
+          <i data-lucide="users" class="w-4 h-4 text-signal-blue"></i> QUEUE MANAGEMENT
+        </h3>
+        <table class="w-full text-sm text-left">
+          <thead class="text-xs font-mono text-neutral-500 border-b border-white/10">
+            <tr><th class="pb-2">LOCATION</th><th class="pb-2">STATUS</th><th class="pb-2 text-right">WAIT</th></tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            <tr><td class="py-2 font-medium">Main Hall</td><td class="py-2 text-red-500">High</td><td class="py-2 text-right font-mono">45m</td></tr>
+            <tr><td class="py-2 font-medium">Prasadam</td><td class="py-2 text-yellow-500">Medium</td><td class="py-2 text-right font-mono">15m</td></tr>
+            <tr><td class="py-2 font-medium">Shoe Counter</td><td class="py-2 text-red-500">High</td><td class="py-2 text-right font-mono">12m</td></tr>
+            <tr><td class="py-2 font-medium">Book Store</td><td class="py-2 text-green-500">Low</td><td class="py-2 text-right font-mono">2m</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Traffic Control -->
+      <div class="bg-black border border-white/10 p-4 rounded-sm flex flex-col gap-2">
+        <h3 class="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-2">
+          <i data-lucide="car" class="w-4 h-4 text-signal-blue"></i> TRAFFIC CONTROL
+        </h3>
+        <div class="text-sm border border-white/5 bg-white/5 p-3 rounded flex flex-col gap-1">
+          <span class="text-yellow-400 font-semibold">Chord Road Blocked</span>
+          <span class="text-neutral-400">Divert incoming traffic to East Route. ETA delay: +15m.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER COLUMN (6 cols) -->
+    <div class="col-span-6 flex flex-col gap-4 overflow-hidden">
+      
+      <!-- Live Smart Map -->
+      <div class="bg-black border border-white/10 rounded-sm flex-grow relative overflow-hidden flex flex-col z-0">
+        <div class="absolute top-4 right-4 z-[400] bg-black/80 backdrop-blur border border-white/10 p-2 flex gap-4 text-xs font-mono rounded pointer-events-auto shadow-lg">
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Crowded</div>
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Moderate</div>
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> Clear</div>
+        </div>
+        <div id="map" class="w-full h-full z-0"></div>
+      </div>
+
+      <!-- CCTV Feed -->
+      <div class="bg-black border border-white/10 p-4 rounded-sm h-48 flex flex-col z-10 shrink-0">
+        <h3 class="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-2">
+          <i data-lucide="video" class="w-4 h-4 text-signal-blue"></i> YOLO VISION AI CCTV
+        </h3>
+        <div class="flex gap-4 h-full">
+          <div class="flex-1 bg-[#111] border border-white/5 relative overflow-hidden group">
+            <div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1 py-0.5 animate-pulse z-10">REC</div>
+            <div class="absolute top-2 right-2 text-[10px] font-mono text-white/50 z-10">CAM 01</div>
+            <div class="w-full h-full opacity-40 bg-[url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center mix-blend-luminosity"></div>
+            <div class="absolute top-1/3 left-1/4 w-12 h-20 border border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+            <div class="absolute top-1/2 right-1/3 w-10 h-16 border border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+          </div>
+          <div class="flex-1 bg-[#111] border border-white/5 relative overflow-hidden group">
+            <div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1 py-0.5 animate-pulse z-10">REC</div>
+            <div class="absolute top-2 right-2 text-[10px] font-mono text-white/50 z-10">CAM 02</div>
+            <div class="w-full h-full opacity-40 bg-[url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=800&auto=format&fit=crop')] bg-cover bg-center mix-blend-luminosity"></div>
+            <div class="absolute top-1/4 left-1/3 w-12 h-20 border border-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN (3 cols) -->
+    <div class="col-span-3 flex flex-col gap-4 overflow-y-auto pl-2 custom-scrollbar">
+      
+      <!-- AI Prediction Graph -->
+      <div class="bg-black border border-white/10 p-4 rounded-sm h-56 flex flex-col">
+        <h3 class="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-4">
+          <i data-lucide="trending-up" class="w-4 h-4 text-signal-blue"></i> AI PREDICTION (NEXT 60M)
+        </h3>
+        <div class="flex-grow relative">
+          <canvas id="predictionChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Emergent LLM Natural Language Insights -->
+      <div class="bg-[#050505] border border-signal-blue/50 p-4 rounded-sm flex flex-col gap-2 relative overflow-hidden shadow-[0_0_15px_rgba(37,99,235,0.1)]">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-signal-blue/10 blur-3xl rounded-full"></div>
+        <h3 class="text-xs font-mono text-signal-blue flex items-center gap-2 mb-2 relative z-10">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> EMERGENT LLM INSIGHTS
+        </h3>
+        
+        <div id="llmResponseContainer" class="text-xs text-neutral-500 italic relative z-10">
+          Ask Emergent LLM for real-time analysis...
+        </div>
+
+        <form id="llmForm" class="mt-2 flex relative z-10">
+          <input 
+            type="text" 
+            id="llmInput"
+            placeholder="E.g., Analyze crowd flow..." 
+            class="flex-grow bg-black border border-white/20 px-3 py-2 text-xs font-mono focus:outline-none focus:border-signal-blue"
+          />
+          <button 
+            type="submit" 
+            id="llmSubmit"
+            class="bg-signal-blue text-white px-3 py-2 text-xs font-bold disabled:opacity-50"
+          >
+            ASK
+          </button>
+        </form>
+      </div>
+
+      <!-- Public Notification -->
+      <div class="bg-black border border-white/10 p-4 rounded-sm flex-grow flex flex-col">
+        <h3 class="text-xs font-mono text-neutral-400 flex items-center gap-2 mb-2">
+          <i data-lucide="bell" class="w-4 h-4 text-signal-blue"></i> AUTO NOTIFICATIONS
+        </h3>
+        <div class="text-xs text-neutral-400 mb-4 bg-white/5 p-2 rounded border border-white/5">
+          "Crowd rising in Main Hall. Open East Entrance now. Rain expected. Crowd likely drops 20%."
+        </div>
+        <button class="w-full bg-signal-blue/20 text-signal-blue border border-signal-blue/50 py-2 rounded text-sm font-semibold hover:bg-signal-blue hover:text-white transition-colors mt-auto">
+          BROADCAST TO DEVOTEES
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // 1. Initialize Lucide Icons
+    lucide.createIcons();
+
+    // 2. Initialize Leaflet Map (ISKCON Bangalore)
+    const map = L.map('map', { zoomControl: false }).setView([13.0094, 77.5511], 17);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://carto.com/">Carto</a>'
+    }).addTo(map);
+
+    // Add Circle Markers
+    L.circleMarker([13.0094, 77.5511], { radius: 35, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.4 })
+      .addTo(map).bindPopup('Main Darshan Hall (Overcrowded)');
+    
+    L.circleMarker([13.0098, 77.5505], { radius: 20, color: '#eab308', fillColor: '#eab308', fillOpacity: 0.4 })
+      .addTo(map).bindPopup('Prasadam Distribution (Moderate)');
+
+    L.circleMarker([13.0085, 77.5515], { radius: 25, color: '#22c55e', fillColor: '#22c55e', fillOpacity: 0.4 })
+      .addTo(map).bindPopup('South Parking (Clear)');
+
+    // 3. Initialize Chart.js
+    const ctx = document.getElementById('predictionChart').getContext('2d');
+    
+    // Gradient for chart
+    let gradient = ctx.createLinearGradient(0, 0, 0, 200);
+    gradient.addColorStop(0, 'rgba(37, 99, 235, 0.8)');
+    gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['18:00', '18:15', '18:30', '18:45', '19:00', '19:15', '19:30'],
+        datasets: [{
+          label: 'Predicted Devotees',
+          data: [4000, 5200, 8100, 9500, 11200, 12500, 11000],
+          borderColor: '#2563eb',
+          backgroundColor: gradient,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#666', font: { size: 10 } } },
+          y: { grid: { color: '#333', borderDash: [3, 3] }, ticks: { color: '#666', font: { size: 10 } } }
+        }
+      }
+    });
+
+    // 4. Simulate Emergent LLM Submission
+    const llmForm = document.getElementById('llmForm');
+    const llmInput = document.getElementById('llmInput');
+    const llmSubmit = document.getElementById('llmSubmit');
+    const llmResponseContainer = document.getElementById('llmResponseContainer');
+
+    llmForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!llmInput.value.trim()) return;
+
+      llmInput.disabled = true;
+      llmSubmit.disabled = true;
+      llmSubmit.textContent = '...';
+
+      setTimeout(() => {
+        llmResponseContainer.innerHTML = `
+          <div class="text-sm text-neutral-300 leading-relaxed bg-black/50 p-3 rounded border border-white/5">
+            Based on the current heatmaps at ISKCON Bangalore, the Main Hall is experiencing a 35% surge over the last 15 minutes. It is highly recommended to redirect incoming devotees to the East Entrance and open the secondary prasadam counter to prevent a bottleneck near the exit.
+          </div>
+        `;
+        llmInput.value = '';
+        llmInput.disabled = false;
+        llmSubmit.disabled = false;
+        llmSubmit.textContent = 'ASK';
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
