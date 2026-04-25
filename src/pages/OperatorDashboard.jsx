@@ -140,7 +140,7 @@ export default function OperatorDashboard() {
   };
 
   return (
-    <div className={`flex flex-col min-h-[calc(100vh-64px)] p-4 font-sans text-white overflow-hidden transition-colors duration-500 ${emergencyMode ? 'bg-[#2a0505] border-[6px] border-red-600/50' : 'bg-[#050505]'}`}>
+    <div className={`flex flex-col min-h-[calc(100vh-64px)] p-4 font-sans text-white lg:overflow-hidden overflow-y-auto transition-colors duration-500 ${emergencyMode ? 'bg-[#2a0505] border-[6px] border-red-600/50' : 'bg-[#050505]'}`}>
       
       {emergencyMode && (
         <div className="bg-red-600 text-white font-bold text-center py-2 mb-4 animate-pulse uppercase tracking-widest text-lg">
@@ -187,10 +187,10 @@ export default function OperatorDashboard() {
       </div>
 
       {/* Main Grid Layout */}
-      <div className="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-grow lg:overflow-hidden overflow-visible">
         
         {/* LEFT COLUMN (3 cols) */}
-        <div className="col-span-3 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+        <div className="col-span-1 lg:col-span-3 flex flex-col gap-4 lg:overflow-y-auto lg:pr-2 custom-scrollbar">
           
           {/* Alert Center */}
           <div className={`border p-4 rounded-sm flex flex-col gap-3 transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-black border-white/10'}`}>
@@ -242,7 +242,7 @@ export default function OperatorDashboard() {
         </div>
 
         {/* CENTER COLUMN (6 cols) */}
-        <div className="col-span-6 flex flex-col gap-4">
+        <div className="col-span-1 lg:col-span-6 flex flex-col gap-4">
           
           {/* Live Smart Map (Temple Interior) */}
           <div className={`border p-4 rounded-sm flex-1 flex flex-col z-0 transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30' : 'bg-black border-white/10'}`}>
@@ -257,7 +257,7 @@ export default function OperatorDashboard() {
               </div>
             </div>
             
-            <div className={`flex-grow relative overflow-hidden rounded border ${emergencyMode ? 'border-red-500/50' : 'border-white/5'}`}>
+            <div className={`min-h-[300px] lg:min-h-0 flex-grow relative overflow-hidden rounded border ${emergencyMode ? 'border-red-500/50' : 'border-white/5'}`}>
               <MapContainer 
                 key={temple.id}
                 center={[temple.lat, temple.lng]} 
@@ -311,7 +311,7 @@ export default function OperatorDashboard() {
                <Car className={`w-4 h-4 ${emergencyMode ? 'text-red-500' : 'text-signal-blue'}`} /> BEST ROAD TO ENTER THE TEMPLE
             </h3>
             
-            <div className={`flex-grow relative overflow-hidden rounded border ${emergencyMode ? 'border-red-500/50' : 'border-white/5'}`}>
+            <div className={`min-h-[300px] lg:min-h-0 flex-grow relative overflow-hidden rounded border ${emergencyMode ? 'border-red-500/50' : 'border-white/5'}`}>
               <MapContainer 
                 key={`${temple.id}-traffic`}
                 center={[temple.lat, temple.lng]} 
@@ -353,7 +353,7 @@ export default function OperatorDashboard() {
         </div>
 
         {/* RIGHT COLUMN (3 cols) */}
-        <div className="col-span-3 flex flex-col gap-4 overflow-y-auto pl-2 custom-scrollbar">
+        <div className="col-span-1 lg:col-span-3 flex flex-col gap-4 lg:overflow-y-auto lg:pl-2 custom-scrollbar">
           
           {/* AI Prediction Graph */}
           <div className={`border p-4 rounded-sm h-56 flex flex-col transition-colors ${emergencyMode ? 'bg-red-950/40 border-red-500/30 opacity-50 pointer-events-none' : 'bg-black border-white/10'}`}>
